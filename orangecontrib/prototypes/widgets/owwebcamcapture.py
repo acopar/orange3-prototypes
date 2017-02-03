@@ -22,12 +22,12 @@ class OWNWebcamCapture(widget.OWWidget):
     icon = "icons/WebcamCapture.svg"
 
     class Output:
-        SNAPSHOT = 'Snapshot'
         SNAPSHOT_ASPECT = 'Snapshot (4:5)'
+        SNAPSHOT = 'Snapshot'
 
     outputs = [
-        (Output.SNAPSHOT, Table),
         (Output.SNAPSHOT_ASPECT, Table),
+        (Output.SNAPSHOT, Table)
     ]
 
     want_main_area = False

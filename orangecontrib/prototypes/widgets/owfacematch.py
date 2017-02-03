@@ -157,8 +157,7 @@ class OWFaceMatch(OWWidget):
     description = "Show reference and selected neighbor."
     icon = "icons/Lookalike.svg"
 
-    inputs = [("Neighbors", Table, "set_neighbors"),
-              ("Reference", Table, "set_reference")]
+    inputs = [("Neighbors", Table, "set_neighbors")]
 
     neighbor_index = 0
     want_main_area = True
@@ -244,7 +243,8 @@ class OWFaceMatch(OWWidget):
         self.neighbors_img_attr = self._get_img_attribute(self.neighbors.domain)
         self.neighbors_img_name = None
         self.reference_img_name = None
-        print('Neighbors attribute', type(self.neighbors_img_attr))
+        self.label_img_name = None
+        
         for attr in self.neighbors.domain.metas:
             if attr.name == 'match image':
                 self.neighbors_img_attr = attr
@@ -252,15 +252,11 @@ class OWFaceMatch(OWWidget):
                 self.neighbors_img_name = attr
             if attr.name == 'image':
                 self.reference_img_attr = attr
-            if attr.name == 'image name':
+            if attr.name == 'image name' or attr.name == 'name':
                 self.reference_img_name = attr
-            print(attr.__dict__)
-            print(attr, ',', attr.attributes.items())
-        #next((attr for attr in self.neighbors.domain.metas if
-        #            ("type", "image") in attr.attributes.items()), None)
-        #    self.neighbors_img_attr = [[get_name(inst[self.neighbors_img_attr].value),
-                  #inst["similarity"].value if "similarity" in
-                                              #self.neighbors.domain else ""]
+            if attr.name == 'Label':
+                self.label_img_name = attr
+        
         if not self.neighbors_img_attr or len(self.neighbors) < 1:
             self.Error.no_images_neighbors()
             return
@@ -269,11 +265,16 @@ class OWFaceMatch(OWWidget):
             name = urlparse(path).path
             return os.path.splitext(os.path.basename(name))[0].replace("_", " ")
 
-        model = [[get_name(inst[self.reference_img_name].value),
-                  inst["similarity"].value if "similarity" in
-                                              self.neighbors.domain else "",
-                  get_name(inst[self.neighbors_img_name].value)]
-                 for inst in self.neighbors]
+        model = []
+        for inst in self.neighbors:
+            x = get_name(inst[self.reference_img_name].value)
+            if self.label_img_name != None:
+                x = get_name(inst[self.label_img_name].value)
+            y = inst["similarity"].value if "similarity" in self.neighbors.domain else ""
+            z = get_name(inst[self.neighbors_img_name].value)
+            t = get_name(inst[self.reference_img_name].value)
+            model.append([x, y, z, t])
+        
         self.neighbors_model.wrap(model)
         selection = QItemSelection(self.neighbors_model.index(0, 0),
                                    self.neighbors_model.index(0, 1))
@@ -347,8 +348,12 @@ class OWFaceMatch(OWWidget):
         widget.setPos(0, 60)
         self.scene.addItem(widget)
 
-        title = QGraphicsSimpleTextItem("{} is {:.1f}% {}".format(
-            self.neighbors_model[self.neighbor_index][0],
+        reference_name = 'I am'
+        if self.neighbors_model[self.neighbor_index][3] != 'Snapshot':
+            reference_name = "{} is".format(self.neighbors_model[self.neighbor_index][3])
+        
+        title = QGraphicsSimpleTextItem("{} {:.1f}% {}".format(
+            reference_name,
             self.neighbors_model[self.neighbor_index][1],
             self.neighbors_model[self.neighbor_index][2]))
         title.setFont(QFont("Garamond", 25))
