@@ -88,7 +88,12 @@ class OWNeighbours(OWWidget):
             return
         distance = self.DISTANCES[self.distance_index]
         n_data, n_ref = len(self.data), len(self.reference)
-        all_data = Table.concatenate([self.reference, self.data], 0)
+        #all_data = Table.concatenate([self.reference, self.data], 0)
+        domain = self.data.domain
+        X = np.vstack([self.reference.X, self.data.X])
+        Y = np.vstack([self.reference.Y, self.data.Y])
+        metas = np.vstack([self.reference.metas, self.data.metas])
+        all_data = Table(domain, X, Y, metas)
         pp_all_data = Impute()(RemoveNaNColumns()(all_data))
         pp_data, pp_reference = pp_all_data[n_ref:], pp_all_data[:n_ref]
         dist = distance(np.vstack((pp_data, pp_reference)))[:n_data, n_data:]

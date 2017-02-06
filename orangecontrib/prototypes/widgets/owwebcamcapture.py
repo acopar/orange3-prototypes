@@ -168,8 +168,9 @@ class OWNWebcamCapture(widget.OWWidget):
 
             image_var = StringVariable('image')
             image_var.attributes['type'] = 'image'
-            table = Table.from_numpy(Domain([], metas=[StringVariable('name'), image_var]),
-                                     np.empty((1, 0)), metas=np.array([[image_title, path]]))
+            table = Table.from_numpy(Domain([], metas=[StringVariable('Image name'), image_var,
+                StringVariable('size'), StringVariable('width'), StringVariable('height')]),
+                                     np.empty((1, 0)), metas=np.array([[image_title, path, 0, 0, 0]]))
             self.send(output, table)
 
         self.snapshot_flash = 80
