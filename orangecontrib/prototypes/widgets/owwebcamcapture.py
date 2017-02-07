@@ -168,7 +168,7 @@ class OWNWebcamCapture(widget.OWWidget):
 
             image_var = StringVariable('image')
             image_var.attributes['type'] = 'image'
-            table = Table.from_numpy(Domain([], metas=[StringVariable('Image name'), image_var,
+            table = Table.from_numpy(Domain([], metas=[StringVariable('image name'), image_var,
                 StringVariable('size'), StringVariable('width'), StringVariable('height')]),
                                      np.empty((1, 0)), metas=np.array([[image_title, path, 0, 0, 0]]))
             self.send(output, table)
