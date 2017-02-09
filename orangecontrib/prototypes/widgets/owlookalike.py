@@ -411,7 +411,7 @@ class OWLookalike(OWWidget):
             mailserver.quit()
         except Exception:
             self.send_image_later(image, email, name)
-            self.Error.smtp_error()
+            #self.Error.smtp_error()
 
     def send_image_later(self, image, email, name):
         if not isinstance(image, QPixmap):
